@@ -9,18 +9,22 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QImage* image = new QImage("/Users/andreasrettig/Desktop/basICColor_CM-Ampel.jpeg");
+   // QImage* image = new QImage("/Users/andreasrettig/Desktop/basICColor_CM-Ampel.jpeg");
+    QImage* image = new QImage("/Users/andreasrettig/Desktop/helge/IMGP9322kl.jpg");
 
     cmsHPROFILE hInProfile, hOutProfile;
     cmsHTRANSFORM hTransform;
 
-    hInProfile  = cmsOpenProfileFromFile("/Users/andreasrettig/Desktop/ampel.icc", "r");
+   //hInProfile  = cmsOpenProfileFromFile("/Users/andreasrettig/Desktop/ampel.icc", "r");
+   hInProfile  = cmsOpenProfileFromFile("/System/Library/ColorSync/Profiles/sRGB Profile.icc", "r");
+
     hOutProfile = cmsOpenProfileFromFile("/System/Library/ColorSync/Profiles/sRGB Profile.icc", "r");
     hTransform = cmsCreateTransform(hInProfile,
-                                    TYPE_BGR_8,
+                                    TYPE_RGB_8,
                                     hOutProfile,
-                                    TYPE_BGR_8,
-                                    INTENT_ABSOLUTE_COLORIMETRIC, 0);
+                                    TYPE_RGB_8,
+                                    INTENT_RELATIVE_COLORIMETRIC, 0);
+
     cmsCloseProfile(hInProfile);
     cmsCloseProfile(hOutProfile);
 
@@ -31,9 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int y = 0; y < image->height(); y++){
         for(int x = 0; x < image->width(); x++){
             QColor col = image->pixel(x, y);
-            rgbInTemp[j] = col.blue();
+            rgbInTemp[j] = col.red();
             rgbInTemp[j + 1] = col.green();
-            rgbInTemp[j + 2] = col.red();
+            rgbInTemp[j + 2] = col.blue();
             j += 3;
         }
     }
@@ -50,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
     ui->label->setPixmap(QPixmap::fromImage(*imout));
-    imout->save("/Users/andreasrettig/Desktop/saved.jpg","JPG",100);
+    imout->save("/Users/andreasrettig/Desktop/saved.png","PNG",100);
 
 }
 
